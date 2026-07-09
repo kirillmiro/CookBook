@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="main-container" id="dishes-page-container" data-favorites='{{ favorite_ids|default([])|tojson }}'>
+
+    <!-- SEARCH -->
+    <section class="search-section">
+        <form action="{{ url_for('index') }}" method="GET" class="search-block">
+            <input type="text" name="search" placeholder="Введите название блюда..." class="search-input" value="{{ search_query }}">
+        </form>
+    </section>
+
+    {% if search_query %}
+    <!-- SEARCH RESULTS -->
+    <section class="dishes-section">
+        <h2 class="section-title">Результаты поиска по запросу «{{ search_query }}»</h2>
+
+        {% if search_results %}
+        <!-- RESULTS -->
+        <div class="dishes-grid">
+            {% for dish in search_results %}
+            <!-- DISH CARD -->
+            <article class="dish-card" data-id="{{ dish.id }}">
+
+                <!-- CARD IMAGE -->
+                <div class="card-img">
+                    {% if dish.category == "завтрак" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/breakfasts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "основное" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/main_courses/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "десерт" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/desserts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "суп" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/soups/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "салат" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/salads/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% endif %}
+                </div>
+
+                <!-- CARD CONTENT -->
+                <div class="card-content">
+
+                    <!-- CARD MAIN -->
+                    <span class="card-category">{{ dish.category }}</span>
+                    <h3 class="card-name">{{ dish.name }}</h3>
+                    <p class="card-description">{{ dish['ingredients'] }}</p>
+                    
+                    <!-- CARD FOOTER -->
+                    <div class="card-footer">
+                        <small class="card-votes">Оценено {{ dish.votes }} раз</small>
+                        <div class="card-actions">
+                            <small class="card-rating">{{ dish.rating }} ★</small>
+                            <button class="heart-btn {% if dish.id|string in favorite_ids %}heart-active{% endif %}" 
+                                    data-id="{{ dish.id }}" 
+                                    onclick="event.stopPropagation(); toggleFavorite('{{ dish.id }}', this)">
+                                {% if dish.id|string in favorite_ids %}♥{% else %}♡{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <!-- NO RESULTS -->
+        <div class="dishes-grid" style="display: block; text-align: center;">
+            <p class="search-none">
+                Ничего не найдено. Попробуйте изменить запрос!
+            </p>
+        </div>
+        {% endif %}
+        <!-- RETURN BUTTON -->
+        <div>
+            <a href="{{ url_for('index') }}" class="page-return-btn">← К рекомендациям</a>
+        </div>
+    </section>
+
+    {% else %}
+
+    <!-- RECOMMENDATIONS FOR THE DAY -->
+    <section class="dishes-section">
+        <h2 class="section-title">⭐ Блюда дня</h2>
+        <div class="dishes-grid">
+            {% for dish in day_dishes %}
+            
+            <!-- DISH CARD -->
+            <article class="dish-card" data-id="{{ dish.id }}">
+
+                <!-- CARD IMAGE -->
+                <div class="card-img">
+                    {% if dish.category == "основное" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/main_courses/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "завтрак" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/breakfasts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "десерт" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/desserts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "суп" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/soups/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "салат" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/salads/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% endif %}
+                </div>
+
+                <!-- CARD CONTENT -->
+                <div class="card-content">
+
+                    <!-- CARD MAIN -->
+                    <span class="card-category">{{ dish.category }}</span>
+                    <h3 class="card-name">{{ dish.name }}</h3>
+                    <p class="card-description">{{ dish['ingredients'] }}</p>
+                    
+                    <!-- CARD FOOTER -->
+                    <div class="card-footer">
+                        <small class="card-votes">Оценено {{ dish.votes }} раз</small>
+                        <div class="card-actions">
+                            <small class="card-rating">{{ dish.rating }} ★</small>
+                            <button class="heart-btn {% if dish.id|string in favorite_ids %}heart-active{% endif %}" 
+                                    data-id="{{ dish.id }}" 
+                                    onclick="event.stopPropagation(); toggleFavorite('{{ dish.id }}', this)">
+                                {% if dish.id|string in favorite_ids %}♥{% else %}♡{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- RECOMMENDATIONS FOR THE WEEK -->
+    <section class="dishes-section">
+        <h2 class="section-title">🔥 Популярное на этой неделе</h2>
+        <div class="dishes-grid">
+            {% for dish in popular_dishes %}
+
+            <!-- DISH CARD -->
+            <article class="dish-card" data-id="{{ dish.id }}">
+
+                <!-- CARD IMAGE -->
+                <div class="card-img">
+                    {% if dish.category == "основное" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/main_courses/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "завтрак" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/breakfasts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "десерт" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/desserts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "суп" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/soups/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% elif dish.category == "салат" %}
+                        <img src="{{ url_for('static', filename='images/Dishes/salads/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
+                    {% endif %}
+                </div>
+                
+                <!-- CARD CONTENT -->
+                <div class="card-content">
+
+                    <!-- CARD MAIN -->
+                    <span class="card-category">{{ dish.category }}</span>
+                    <h3 class="card-name">{{ dish.name }}</h3>
+                    <p class="card-description">{{ dish['ingredients'] }}</p>
+                    
+                    <!-- CARD FOOTER -->
+                    <div class="card-footer">
+                        <small class="card-votes">Оценено {{ dish.votes }} раз</small>
+                        <div class="card-actions">
+                            <small class="card-rating">{{ dish.rating }} ★</small>
+                            <button class="heart-btn {% if dish.id|string in favorite_ids %}heart-active{% endif %}" 
+                                    data-id="{{ dish.id }}" 
+                                    onclick="event.stopPropagation(); toggleFavorite('{{ dish.id }}', this)">
+                                {% if dish.id|string in favorite_ids %}♥{% else %}♡{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- SEARCH HISTORY -->
+    <section class="dishes-section">
+        <h2 class="section-title">История</h2>
+        <div style="padding: 1rem 0; color: var(--color-text-muted);">
+            <span>История поиска пуста</span>
+        </div>
+    </section>
+
+    {% endif %}
+
+</main>
+{% endblock %}

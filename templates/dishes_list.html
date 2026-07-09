@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main class="main-container" id="dishes-page-container" data-favorites='{{ favorite_ids|default([])|tojson }}'>
+
+    <!-- SORT CHOICE -->
+    <section class="sort-block">
+        <button class="sort-btn active" data-sort="rating">По рейтингу</button>
+        <button class="sort-btn" data-sort="votes">По популярности</button>
+        <button class="sort-btn" data-sort="name">По алфавиту</button>
+    </section>
+
+    <!-- BREAKFAST -->
+    <section class="dishes-section">
+        <h2 class="section-title">🍳 Завтраки</h2>
+        <div class="dishes-grid" id="recipes-grid-завтрак"></div>
+        <nav class="pagination">
+            <button class="page-btn" data-cat="завтрак" data-dir="-1">«</button>
+            <span class="page-info" id="page-info-завтрак">1 / 1</span>
+            <button class="page-btn" data-cat="завтрак" data-dir="1">»</button>
+        </nav>
+    </section>
+
+    <!-- MAIN COURSES -->
+    <section class="dishes-section">
+        <h2 class="section-title">🥩 Основные блюда</h2>
+        <div class="dishes-grid" id="recipes-grid-основное"></div>
+        <nav class="pagination">
+            <button class="page-btn" data-cat="основное" data-dir="-1">«</button>
+            <span class="page-info" id="page-info-основное">1 / 1</span>
+            <button class="page-btn" data-cat="основное" data-dir="1">»</button>
+        </nav>
+    </section>
+
+    <!-- SOUPS -->
+    <section class="dishes-section">
+        <h2 class="section-title">🍜 Супы</h2>
+        <div class="dishes-grid" id="recipes-grid-суп"></div>
+        <nav class="pagination">
+            <button class="page-btn" data-cat="суп" data-dir="-1">«</button>
+            <span class="page-info" id="page-info-суп">1 / 1</span>
+            <button class="page-btn" data-cat="суп" data-dir="1">»</button>
+        </nav>
+    </section>
+
+    <!-- SALADS -->
+    <section class="dishes-section">
+        <h2 class="section-title">🥗 Салаты</h2>
+        <div class="dishes-grid" id="recipes-grid-салат"></div>
+        <nav class="pagination">
+            <button class="page-btn" data-cat="салат" data-dir="-1">«</button>
+            <span class="page-info" id="page-info-салат">1 / 1</span>
+            <button class="page-btn" data-cat="салат" data-dir="1">»</button>
+        </nav>
+    </section>
+
+    <!-- DESSERTS -->
+    <section class="dishes-section">
+        <h2 class="section-title">🍰 Десерты</h2>
+        <div class="dishes-grid" id="recipes-grid-десерт"></div>
+        <nav class="pagination">
+            <button class="page-btn" data-cat="десерт" data-dir="-1">«</button>
+            <span class="page-info" id="page-info-десерт">1 / 1</span>
+            <button class="page-btn" data-cat="десерт" data-dir="1">»</button>
+        </nav>
+    </section>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dishes.js') }}"></script>
+{% endblock %}

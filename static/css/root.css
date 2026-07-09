@@ -1,0 +1,62 @@
+:root {
+    /* BACKGROUND COLORS */
+    --color-bg-main: #faf7f2;
+    --color-bg-surface: #ffffff;
+
+    /* HEADER / FOOTER / BRAND */
+    --color-header: #2c4a3e;
+    --color-footer: #1a2f26;
+
+    /* TEXT COLORS */
+    --color-text-main: #555555;
+    --color-text-light: #ffffff;
+    --color-text-muted: #a3b899;
+
+    /* BORDER COLORS */
+    --color-border: #e3ded7;
+
+    /* BUTTONS & TOGGLES */
+    --color-toggle-bg: #ffffff33;
+    --color-toggle-bg-hover: #ffffff66;
+    --color-nav-btn-bg: #ffffff26;
+    --color-nav-btn-border: #ffffff4d;
+
+    /* CARD COLORS */
+    --color-card-text-light: #7f7f7f;
+    --color-card-text-red: #ff6b6b;
+    --color-card-text-orange: #ffa800;
+    --color-card-image-hover: #585858;
+    --color-heart: #e0383e;
+}  
+
+/* ТЕМНАЯ ТЕМА */
+:root:has(#theme:checked) {
+    /* BACKGROUND COLORS */
+    --color-bg-main: #121a16;
+    --color-bg-surface: #1c2621;
+    
+    /* HEADER / FOOTER / BRAND */
+    --color-header: #4a7363;
+    --color-footer: #0b120f;
+    
+    /* TEXT COLORS */
+    --color-text-main: #c9d6d0;
+    --color-text-light: #ffffff;
+    --color-text-muted: #768f83;
+    
+    /* BORDER COLORS */
+    --color-border: #2d3d35;
+
+    /* BUTTONS & TOGGLES */
+    --color-toggle-bg: #ffffff1a;
+    --color-toggle-bg-hover: #ffffff40;
+    --color-nav-btn-bg: #ffffff1a;
+    --color-nav-btn-border: #ffffff33;
+
+    /* CARD COLORS */
+    --color-card-text-light: #c3c3c3;
+    --color-card-text-red: #ba4949;
+    --color-card-text-orange: #c68200;
+    --color-card-image-hover: #d8d8d8;
+    --color-heart: #e0383e;
+}

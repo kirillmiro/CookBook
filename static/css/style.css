@@ -1,0 +1,932 @@
+@import url('root.css');
+ 
+/* Сброс отступов и глобальные настройки box-sizing для всех элементов */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+ 
+/* --- GLOBAL STYLES --- */
+
+/* Стили основного тела страницы с поддержкой прижатия футера к низу */
+body {
+    background-color: var(--color-bg-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+ 
+/* Плавные переходы цветов для анимации переключения тем оформления */
+header, main, article, footer, article h2, label[for="theme"], .dish-card, .page-btn, .recipe-card {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+}
+
+/* Ограничивающий контейнер контента для выравнивания по центру экрана */
+.main-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex: 1;
+}
+
+/* --- HEADER AND NAVIGATION --- */
+
+/* Верхняя шапка сайта, прокручивающаяся вместе со всей страницей */
+header {
+    background-color: var(--color-header);
+    min-height: 10vh;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Флекс-панель навигации распределяющая элементы по краям */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    padding: 0.5rem 1rem;
+}
+
+/* Ссылка-обертка для корректного позиционирования логотипа */
+.logo-link {
+    display: flex;
+    align-items: center;
+}
+
+/* Круглое изображение логотипа бренда с адаптивным размером */
+.Logo {
+    height: auto;
+    max-height: clamp(2.5rem, 4vw, 3.2rem);
+    width: auto;
+    border-radius: 50%;
+}
+
+/* Правый блок элементов управления переключателем темы и бургером */
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+/* Скрытый нативный чекбокс графического тумблера смены тем */
+.theme-wrapper input[type="checkbox"] {
+    display: none;
+}
+
+/* Круглая подложка-кнопка для переключателя цветовой темы */
+.theme-wrapper label {
+    width: clamp(2.2rem, 3.5vw, 2.8rem);
+    height: clamp(2.2rem, 3.5vw, 2.8rem);
+    background-color: var(--color-toggle-bg, #5c4033);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Псевдоэлемент выводящий иконку солнца для светлого режима */
+.theme-wrapper label::before {
+    content: "☀️";
+    font-size: 1.1rem;
+}
+
+/* Переключение иконки на луну при активации ночного режима */
+.theme-wrapper input:checked + label::before {
+    content: "🌙";
+}
+
+/* Кнопка бургер-меню для раскрытия ссылок на смартфонах */
+.burger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 26px;
+    height: 18px;
+    cursor: pointer;
+    z-index: 1010;
+}
+
+/* Индивидуальные полоски внутри иконки мобильного бургер-меню */
+.burger span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: var(--color-text-light);
+    border-radius: 3px;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+/* Горизонтальный список текстовых ссылок навигации для ПК */
+.nav-links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: clamp(1.5rem, 3vw, 3rem);
+    margin-left: auto;
+    margin-right: 3rem;
+}
+
+/* Стилизация текстовых ссылок внутри главного меню навигации */
+.nav-links li a {
+    text-decoration: none;
+    color: var(--color-text-light);
+    font-weight: bold;
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
+    white-space: nowrap;
+}
+
+/* Эффект полупрозрачности при наведении курсора на ссылку меню */
+.nav-links li a:hover {
+    opacity: 0.8;
+}
+
+/* --- MAIN CONTENT SECTIONS --- */
+
+/* Центрированные секции поисковой строки и вывода списков блюд */
+.search-section, .dishes-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 3rem;
+    width: 100%;
+}
+
+/* Заголовки разделов каталога и каруселей рекомендаций */
+.section-title {
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    color: var(--color-text-main);
+    margin: 0 0 1.5rem 0;
+    align-self: flex-start;
+}
+
+.favorite{
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    color: var(--color-text-main);
+    margin: 3rem 0;
+    align-self: flex-start;
+}
+
+/* Форма-блок позиционирования строки глобального поиска рецептов */
+.search-block {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+/* Закругленное текстовое поле ввода для поиска по ключевым словам */
+.search-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-radius: 30px;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+    font-size: 1.05rem;
+    outline: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Подсветка границ поисковой строки при фокусе ввода */
+.search-input:focus {
+    border-color: var(--color-header);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Информационный текст сообщения при отсутствии совпадений в поиске */
+.search-none {
+    font-size: 1.2rem;
+    padding: 2rem 0;
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+/* Кнопка сброса параметров для быстрого возврата к рекомендациям */
+.page-return-btn {
+    display: inline-block;
+    width: auto;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem 1.5rem;
+    text-decoration: none;
+    text-align: center; 
+    margin-top: 2rem;
+}
+
+/* Цветовой инверсивный эффект при наведении на кнопку возврата */
+.page-return-btn:hover {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+    border-color: var(--color-header);
+}
+
+/* Контейнер кнопок переключения критериев сортировки в каталоге */
+.sort-block {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    justify-content: flex-start;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+/* Индивидуальные кнопки сортировки списка блюд */
+.sort-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Активное и hover-состояние кнопок переключения критериев фильтрации */
+.sort-btn.active, .sort-btn:hover {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+    border-color: var(--color-header);
+}
+
+/* --- HISTORY SECTION STYLES --- */
+
+/* Новая flex-сетка вместо grid, чтобы нижние карточки центрировались */
+.history-dishes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+/* Принудительно задаем размер карточкам внутри истории, как в оригинальной сетке */
+.history-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
+    width: 270px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    position: relative;
+    cursor: pointer;
+}
+
+/* Изначально скрытые карточки последующих порций */
+.history-card.history-card-hidden {
+    display: none !important;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Класс плавного появления, который будет вешать JS */
+.history-card.history-card-visible {
+    display: flex !important;
+    animation: fadeHistoryCard 0.5s ease forwards;
+}
+
+@keyframes fadeHistoryCard {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Обертка для кнопок управления */
+.history-controls-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Тот самый нужный зазор между кнопками */
+    margin-top: 2.5rem;
+    width: 100%;
+}
+
+/* Общие стили для кнопок управления историей */
+.history-ctrl-btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.history-ctrl-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Оранжевая кнопка "Смотреть дальше" */
+.btn-more-orange {
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+}
+
+.btn-more-orange:hover {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+}
+
+/* Серая стильная кнопка "Скрыть" */
+.btn-hide-gray {
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+}
+
+.btn-hide-gray:hover {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+}
+
+.btn-all-blue{
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+}
+
+.btn-all-blue:hover {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+}
+
+/* --- DISHES CARDS TEMPLATE --- */
+
+/* Сетка для размещения мини-карточек блюд с поддержкой переносов */
+.dishes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Служебный класс для плавного скрытия сеток при переключении страниц через JS */
+.dishes-grid.fade-out {
+    opacity: 0;
+}
+
+/* Стили корпуса карточки блюда на главной странице и в списках */
+.dish-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
+    width: 270px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    position: relative;
+    cursor: pointer;
+}
+
+/* Легкое всплытие карточки рецепта вверх при наведении мыши */
+.dish-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Изображение готового блюда внутри мини-карточки каталога */
+.dish-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+/* Текстовое наполнение и внутренние отступы мини-карточки */
+.card-content {
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Верхний ярлык названия категории над заголовком карточки */
+.card-category {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-card-text-red);
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+/* Краткий контрастный заголовок с названием рецепта в карточке */
+.card-name {
+    font-size: 1.2rem;
+    color: var(--color-text-main);
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+}
+
+/* Область вывода сокращенного списка ингредиентов под названием */
+.card-description {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    flex: 1;
+}
+
+/* Нижний подвал карточки для размещения счетчиков и кнопок */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.8rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Текст количества голосов, оставленных пользователями за данный рецепт */
+.card-votes {
+    font-size: 0.85rem;
+    color: var(--color-text-main);
+    font-weight: 500;
+}
+
+/* Контейнер группировки плашки рейтинга и кнопки избранного */
+.card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Золотистая подложка числового значения рейтинга со звездой */
+.card-rating {
+    background-color: #ffb703;
+    color: #000;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Кнопка добавления в Избранное в виде интерактивного сердечка */
+.heart-btn {
+    background: none;
+    border: none;
+    color: #4a362c;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s, transform 0.2s;
+    position: relative;
+    z-index: 10;
+}
+
+/* Увеличение масштаба и покраснение сердечка при наведении курсора */
+.heart-btn:hover {
+    transform: scale(1.15);
+    color: #ff4d6d;
+}
+
+/* Яркий залитый цвет для активных кнопок лайка, сохраненных в сессии */
+.heart-btn.heart-active {
+    color: #ff4d6d;
+}
+
+/* --- PAGINATION SYSTEM --- */
+
+/* Общий блок размещения элементов управления пагинацией каталога */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+/* Круглые кнопочные стрелки для перехода по страницам */
+.page-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Подсветка кнопок страниц при наведении курсора мыши */
+.page-btn:hover:not(.disabled) {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+    border-color: var(--color-header);
+}
+
+/* Полупрозрачное состояние заблокированной кнопки пагинации (крайние страницы) */
+.page-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Текстовый индикатор текущей позиции пагинации (например, 1 / 3) */
+.page-info {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* --- RECIPE PAGE DETAILED STYLES --- */
+
+.return-link {
+    display: inline-block;
+    width: auto;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-card);
+    color: var(--color-text-main);
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem 1.5rem;
+    text-decoration: none;
+    text-align: center; 
+}
+
+/* Цветовой инверсивный эффект при наведении на кнопку возврата */
+.return-link:hover {
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+    border-color: var(--color-header);
+}
+
+
+/* Большая карточка-контейнер для детального отображения страницы рецепта */
+.recipe-card {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 24px;
+    overflow: hidden;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+/* Обертка для фиксации пропорций главного большого изображения блюда */
+.recipe-img-wrapper {
+    width: auto;
+    height: clamp(250px, 60vh, 400px);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Полноэкранная большая картинка готового рецепта на странице описания */
+.recipe-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Основной контентный блок текстового наполнения страницы рецепта */
+.recipe-body {
+    padding: clamp(1.5rem, 4vw, 3rem);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Флекс-строка заголовка для ровного размещения названия и сердечка лайка */
+.recipe-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1.2rem;
+}
+
+/* Вертикальный блок группировки тега категории и главного тега h1 */
+.recipe-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+/* Яркий текстовый маркер категории на странице просмотра рецепта */
+.recipe-category-tag {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--color-card-text-red);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+/* Главный крупный заголовок с названием просматриваемого блюда */
+.recipe-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--color-text-main);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* Строка метаданных для вывода badge-рейтинга и количества оценок */
+.recipe-meta-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: -0.5rem;
+}
+
+/* Крупная контрастная плашка отображения дробного балла рейтинга рецепта */
+.recipe-rating-badge {
+    background-color: #ffb703;
+    color: #000;
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 6px rgba(255,183,3,0.2);
+}
+
+/* Текстовый счетчик количества человек, проголосовавших за блюдо на странице рецепта */
+.recipe-votes-count {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+/* Изолированные контентные блоки для разделения ингредиентов, шагов и оценок */
+.recipe-section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Подзаголовки h2 для обозначения контентных секций внутри рецепта */
+.recipe-section-title {
+    font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+    color: var(--color-text-main);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Обертка для центрирования интерактивного виджета выбора звезд */
+.recipe-stars-wrapper {
+    background-color: var(--color-bg-main);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    display: inline-flex;
+    align-self: flex-start;
+    border: 1px solid var(--color-border);
+}
+
+/* Главный контейнер звездного виджета, считывающий координаты мыши */
+.recipe-stars-container {
+    position: relative;
+    font-size: 2.2rem;
+    letter-spacing: 4px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+}
+
+/* Нижний базовый слой пустых серых звезд виджета оценки */
+.recipe-stars-gray {
+    color: #e3ded7;
+}
+
+/* Верхний перекрывающий динамический слой золотых звезд рейтинга */
+.recipe-stars-active {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    color: #ffb703;
+    overflow: hidden;
+    transition: width 0.1s ease;
+}
+
+/* Маркированный список для вывода перечня необходимых ингредиентов */
+.recipe-ingredients-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    background-color: var(--color-bg-main);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--color-border);
+}
+
+/* Элемент списка ингредиентов с кастомным текстовым оформлением */
+.recipe-list-item {
+    font-size: 1.05rem;
+    color: var(--color-text-main);
+    line-height: 1.5;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+/* Кастомный зеленый маркер-точка перед каждым пунктом ингредиентов */
+.recipe-list-item::before {
+    content: "•";
+    color: var(--color-header);
+    font-weight: bold;
+    position: absolute;
+    left: 0.2rem;
+    font-size: 1.2rem;
+}
+
+/* Нумерованный вертикальный список для пошаговой инструкции приготовления */
+.recipe-instructions-list {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    counter-reset: steps-counter;
+}
+
+/* Индивидуальный шаг приготовления с автоматической нумерацией */
+.recipe-step-item {
+    font-size: 1.05rem;
+    color: var(--color-text-main);
+    line-height: 1.6;
+    position: relative;
+    padding-left: 3rem;
+    counter-increment: steps-counter;
+}
+
+/* Круглый цифровой кастомный маркер для визуального выделения номеров шагов */
+.recipe-step-item::before {
+    content: counter(steps-counter);
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    background-color: var(--color-header);
+    color: var(--color-text-light);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+/* --- FOOTER MAIN --- */
+
+/* Нижний подвал сайта, фиксирующийся на границе экрана при малом объеме контента */
+footer {
+    background-color: var(--color-footer);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-text-muted);
+    padding: 1.5rem;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Центрированный внутренний контейнер контента внутри футера */
+.footer-content {
+    text-align: center;
+    padding: 0.5rem 0;
+}
+
+/* Блок строки для вывода контактного адреса электронной почты */
+.footer-email-block {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Подчеркнутая чистая ссылка отправки письма в саппорт CookBook */
+.footer-email-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* --- RESPONSIVE MEDIA QUERIES --- */
+
+/* Адаптивные медиа-правила для мобильных телефонов и планшетных компьютеров */
+@media (max-width: 768px) {
+    /* Перевод панели навигации в режим распределения пространства */
+    .navbar {
+        justify-content: space-between;
+    }
+
+    /* Активация отображения иконки бургер-меню */
+    .burger {
+        display: flex;
+    }
+
+    /* Вертикальное мобильное выпадающее меню навигации */
+    .nav-links {
+        display: flex;
+        position: absolute;
+        top: 100%; 
+        left: 0;
+        width: 100%;
+        background-color: var(--color-header);
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease-in-out;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        margin: 0!important;
+    }
+
+    /* Растягивание пунктов списка меню на всю ширину экрана смартфона */
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Крупные кликабельные области ссылок внутри мобильного выпадающего меню */
+    .nav-links li a {
+        display: block;
+        padding: 1.2rem 0;
+        width: 100%;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 1.2rem;
+    }
+
+    /* Класс раскрытия высоты шторки мобильного меню при клике на бургер */
+    .nav-links.show {
+        max-height: 300px;
+    }
+
+    /* Поворот верхней полоски бургера при трансформации в крестик */
+    .burger.active span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    /* Исчезновение центральной полоски бургера при трансформации в крестик */
+    .burger.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    /* Поворот нижней полоски бургера при трансформации в крестик */
+    .burger.active span:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
+
+/* Адаптачия для выбора сортировки в каталоге */
+@media (max-width: 565px) {
+    .sort-block {
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Адаптивные правила для узких экранов мобильных устройств */
+@media (max-width: 626px) {
+    /* Перевод карточек каталога в одноколоночный полноэкранный режим */
+    .dish-card {
+        width: 60%;
+    }
+}
+
+/* Адаптивные правила для узких экранов мобильных устройств 2*/
+@media (max-width: 480px) {
+    /* Перевод карточек каталога в одноколоночный полноэкранный режим */
+    .dish-card {
+        width: 80%;
+    }
+}

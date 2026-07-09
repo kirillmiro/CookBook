@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CookBook{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="{{ url_for('index') }}" class="logo-link">
+                <img src="{{ url_for('static', filename='Images/Logic.img/Logo.png') }}" class="Logo" alt="Logo_image">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Главная</a></li>
+                <li><a href="{{ url_for('dishes') }}">Блюда</a></li>
+                <li><a href="{{ url_for('favorites') }}">Избранное</a></li>
+                <li><a href="#Contacts">Контакты</a></li>
+            </ul>
+
+            <div class="nav-controls">
+                <div class="theme-wrapper">
+                    <input type="checkbox" id="theme">
+                    <label for="theme"></label>
+                </div>
+
+                <div class="burger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    {% block content %}{% endblock %}
+
+    <footer id="Contacts">
+        <div class="footer-content">
+            <p>&copy; 2026 CookBook</p>
+            <p class="footer-email-block">
+                Связь с нами: <a href="mailto:cookbook.contact2026@gmail.com" class="footer-email-link">cookbook.contact2026@gmail.com</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+    
+</body>
+</html>
