@@ -82,7 +82,7 @@ function renderRecipes(items, cat) {
         return `
             <article class="dish-card" data-id="${dish.id}">
                 <div>
-                    <img src="/static/Images/Dishes/${folder}/${dish.image}" class="dish-card-img" alt="${dish.name}">
+                    <img src="/static/images/Dishes/${folder}/${dish.image}" class="dish-card-img" alt="${dish.name}">
                 </div>
                 <div class="card-content">
                     <span class="card-category">${dish.category}</span>
