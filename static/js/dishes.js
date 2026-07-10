@@ -1,4 +1,3 @@
-// Map категорий
 const folderMap = {
     'основное': 'main_courses',
     'суп': 'soups',

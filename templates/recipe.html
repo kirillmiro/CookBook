@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<main class="main-container" id="dishes-page-container" data-favorites='{{ favorite_ids|default([])|tojson }}' style="display: flex;  justify-content: center;">
-
+<main class="main-container" id="dishes-page-container" data-favorites='{{ favorite_ids|default([])|tojson }}' style="display: flex;  justify-content: center; align-items: flex-start;">
     <section class="recipe-card">
-        
+
+        <!-- CARD IMAGE -->
         <article class="recipe-img-wrapper">
             {% if dish.category == "завтрак" %}
                 <img src="{{ url_for('static', filename='images/Dishes/breakfasts/' + dish.image) }}" class="recipe-hero-img" alt="{{ dish.name }}">
@@ -20,13 +20,14 @@
         </article>
 
         <article class="recipe-body">
-            
+
+            <!-- CARD HEADER -->
             <div class="recipe-header-row">
                 <div class="recipe-title-group">
                     <span class="recipe-category-tag">{{ dish.category }}</span>
                     <h1 class="recipe-title">{{ dish.name }}</h1>
                 </div>
-                
+                <!-- HEART BUTTON -->
                 <button class="heart-btn {% if dish.id|string in favorite_ids %}heart-active{% endif %}" 
                         data-id="{{ dish.id }}" 
                         onclick="event.stopPropagation(); toggleFavorite('{{ dish.id }}', this)"
@@ -35,11 +36,13 @@
                 </button>
             </div>
             
+            <!-- CARD RATING -->
             <div class="recipe-meta-stats">
                 <span class="recipe-rating-badge" id="recipe-rating-val">{{ "%.2f"|format(dish.rating|float) }} ★</span>
                 <span class="recipe-votes-count" id="recipe-votes-val">Оценено {{ dish.votes }} раз</span>
             </div>
 
+            <!-- CARD VOTE -->
             <div class="recipe-section-block">
                 <h2 class="recipe-section-title">⭐ Оцените рецепт:</h2>
                 <div class="recipe-stars-wrapper">
@@ -50,6 +53,7 @@
                 </div>
             </div>
 
+            <!-- INGREDIENTS -->
             <div class="recipe-section-block">
                 <h2 class="recipe-section-title">🛒 Ингредиенты</h2>
                 <ul class="recipe-ingredients-list">
@@ -61,6 +65,7 @@
                 </ul>
             </div>
 
+            <!-- INSTRUCTIONS -->
             <div class="recipe-section-block">
                 <h2 class="recipe-section-title">👨‍🍳 Приготовление</h2>
                 <ul class="recipe-instructions-list">
@@ -71,6 +76,8 @@
                     {% endfor %}
                 </ul>
             </div>
+
+            <!-- RETURN BUTTON -->
             <div class="return-link-wrapper">
                 <a href="{{ back_url }}" class="return-link">← Вернуться назад</a>
             </div>
@@ -80,6 +87,7 @@
 </main>
 {% endblock %}
 
+<!-- SCRIPTS -->
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/recipe.js') }}"></script>
 {% endblock %}

@@ -36,7 +36,6 @@ header, main, article, footer, article h2, label[for="theme"], .dish-card, .page
 /* Верхняя шапка сайта, прокручивающаяся вместе со всей страницей */
 header {
     background-color: var(--color-header);
-    min-height: 10vh;
     display: flex;
     align-items: center;
     width: 100%;
@@ -55,7 +54,7 @@ header {
     max-width: 1400px;
     margin: 0 auto;
     position: relative;
-    padding: 0.5rem 1rem;
+    padding: 1rem 2rem;
 }
 
 /* Ссылка-обертка для корректного позиционирования логотипа */
@@ -88,7 +87,7 @@ header {
 .theme-wrapper label {
     width: clamp(2.2rem, 3.5vw, 2.8rem);
     height: clamp(2.2rem, 3.5vw, 2.8rem);
-    background-color: var(--color-toggle-bg, #5c4033);
+    background-color: var(--color-toggle-bg);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -172,11 +171,9 @@ header {
     align-self: flex-start;
 }
 
+/* Заголовок на страничке "Избранное" */
 .favorite{
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
-    color: var(--color-text-main);
     margin: 3rem 0;
-    align-self: flex-start;
 }
 
 /* Форма-блок позиционирования строки глобального поиска рецептов */
@@ -480,8 +477,8 @@ header {
 
 /* Золотистая подложка числового значения рейтинга со звездой */
 .card-rating {
-    background-color: #ffb703;
-    color: #000;
+    background-color: var(--color-card-text-orange);
+    color: black;
     padding: 0.2rem 0.5rem;
     border-radius: 6px;
     font-weight: 700;
@@ -492,7 +489,7 @@ header {
 .heart-btn {
     background: none;
     border: none;
-    color: #4a362c;
+    color: var(--color-card-text-light);
     font-size: 2rem;
     cursor: pointer;
     line-height: 1;
@@ -504,12 +501,12 @@ header {
 /* Увеличение масштаба и покраснение сердечка при наведении курсора */
 .heart-btn:hover {
     transform: scale(1.15);
-    color: #ff4d6d;
+    color: var(--color-heart);
 }
 
 /* Яркий залитый цвет для активных кнопок лайка, сохраненных в сессии */
 .heart-btn.heart-active {
-    color: #ff4d6d;
+    color: var(--color-heart);
 }
 
 /* --- PAGINATION SYSTEM --- */
@@ -591,16 +588,17 @@ header {
     border: 1px solid var(--color-border);
     border-radius: 24px;
     overflow: hidden;
-    width: 70%;
+    width: clamp(700px, 45vw, 1000px);
     display: flex;
     flex-direction: column;
     box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    margin: 2rem auto;
 }
 
 /* Обертка для фиксации пропорций главного большого изображения блюда */
 .recipe-img-wrapper {
     width: auto;
-    height: clamp(250px, 60vh, 400px);
+    height: clamp(200px, 50vh, 550px);
     overflow: hidden;
     position: relative;
 }
@@ -665,8 +663,8 @@ header {
 
 /* Крупная контрастная плашка отображения дробного балла рейтинга рецепта */
 .recipe-rating-badge {
-    background-color: #ffb703;
-    color: #000;
+    background-color: var(--color-card-text-orange);
+    color: black;
     padding: 0.35rem 0.8rem;
     border-radius: 8px;
     font-weight: 800;
@@ -722,7 +720,7 @@ header {
 
 /* Нижний базовый слой пустых серых звезд виджета оценки */
 .recipe-stars-gray {
-    color: #e3ded7;
+    color: var(--color-card-text-light);
 }
 
 /* Верхний перекрывающий динамический слой золотых звезд рейтинга */
@@ -732,7 +730,7 @@ header {
     left: 0;
     width: 0%;
     height: 100%;
-    color: #ffb703;
+    color: var(--color-card-text-orange);
     overflow: hidden;
     transition: width 0.1s ease;
 }
@@ -839,6 +837,21 @@ footer {
 
 /* --- RESPONSIVE MEDIA QUERIES --- */
 
+/* Адаптачия для картинки в рецепте */
+@media (max-width: 1050px) {
+    /* Уменьшение размера картинки в рецепте */
+    .recipe-img-wrapper {
+        width: auto;
+        height: clamp(100px, 40vh, 400px);
+    }
+
+    /* Выравнивание рецепта для адаптации */
+    .recipe-card {
+        width: 80%;
+    }
+
+}
+
 /* Адаптивные медиа-правила для мобильных телефонов и планшетных компьютеров */
 @media (max-width: 768px) {
     /* Перевод панели навигации в режим распределения пространства */
@@ -903,15 +916,31 @@ footer {
     .burger.active span:nth-child(3) {
         transform: translateY(-8px) rotate(-45deg);
     }
+
+    .recipe-card {
+        width: 70%;
+    }
+
+    /* Уменьшение размера картинки в рецепте 2*/
+    .recipe-img-wrapper {
+        width: auto;
+        height: clamp(150px, 30vh, 350px);
+    }
 }
 
-/* Адаптачия для выбора сортировки в каталоге */
+/* Адаптачия для выбора сортировки блюд в каталоге */
 @media (max-width: 565px) {
+    /* Изменение логики и отступов для выбора сортировки блюд в каталоге */
     .sort-block {
         justify-content: center;
         flex-wrap: wrap;
         margin-top: 1rem;
         margin-bottom: 1rem;
+    }
+    
+    /* Перевод карточку рецепта в одноколоночный полноэкранный режим */
+    .recipe-card {
+        width: 80%;
     }
 }
 
@@ -921,12 +950,64 @@ footer {
     .dish-card {
         width: 60%;
     }
+
+    /* Уменьшение размера картинки в рецепте 3*/
+    .recipe-img-wrapper {
+        width: auto;
+        height: clamp(100px, 30vh, 250px);
+    }
 }
 
 /* Адаптивные правила для узких экранов мобильных устройств 2*/
 @media (max-width: 480px) {
+    /* Изменение отступов для адаптации хедера */
+    .navbar {
+        padding: 1rem;
+    }
+
     /* Перевод карточек каталога в одноколоночный полноэкранный режим */
     .dish-card {
         width: 80%;
+    }
+
+    /* Перевод карточку рецепта в одноколоночный полноэкранный режим */
+    .recipe-card {
+        width: 90%;
+    }
+
+    /* Уменьшение размера картинки в рецепте 4*/
+    .recipe-img-wrapper {
+        width: auto;
+        height: clamp(100px, 25vh, 250px);
+    }
+    
+    /* Уменьшение и центровка текста загаловка */
+    .favorite {
+        font-size: clamp(1.4rem, 3vw, 2.2rem);
+        margin: 3rem auto 1rem;
+    }
+}
+
+
+/* Адаптивные правила для узких экранов мобильных устройств 3*/
+@media (max-width: 355px) {
+    /* Перевод карточек каталога в одноколоночный полноэкранный режим */
+    .dish-card {
+        width: 80%;
+    }
+
+    /* Перевод карточку рецепта в одноколоночный полноэкранный режим */
+    .recipe-card {
+        width: 90%;
+    }
+
+    /* Уменьшение размера картинки в рецепте 4*/
+    .recipe-img-wrapper {
+        width: auto;
+        height: clamp(100px, 20vh, 200px);
+    }
+
+    .favorite {
+        font-size: 1.35rem;
     }
 }

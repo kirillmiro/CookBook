@@ -7,25 +7,25 @@ from flask import Flask, render_template, request, jsonify, session, url_for
 # Импортируем наш обновленный список рецептов из файла данных
 from recipes_data import DISHES_RECIPES
 
-# APP_CONFIGURATION
+# APP CONFIGURATION
 app = Flask(__name__, static_url_path='/static')
 # Добавляем секретный ключ для работы сессий Flask (нужно для Избранного)
 app.secret_key = 'super_secret_key_foodfinder_2026'
 
-# DATABASE_CONNECTION
+# DATABASE CONNECTION
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-# TABLES_INITIALIZATION
+# TABLES INITIALIZATION
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # DROPPING_TABLES_FOR_QUICK_RESTART
-    cursor.execute("DROP TABLE IF EXISTS recipes")
-    cursor.execute("DROP TABLE IF EXISTS viewed_history")
+    # DROPPING TABLES FOR QUICK RESTART IF NEEDED (UNCOMMENT IF NECESSARY)
+    # cursor.execute("DROP TABLE IF EXISTS recipes")
+    # cursor.execute("DROP TABLE IF EXISTS viewed_history")
 
     # RECIPES_TABLE
     # ТАБЛИЦА БЛЮД 
@@ -55,10 +55,16 @@ def init_db():
     ''')
 
     # DB_FILLING
-    cursor.executemany('''
-        INSERT INTO recipes (name, category, ingredients, instructions, image, rating, votes, is_liked)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0)
-    ''', DISHES_RECIPES)
+    # Проверяем количество записей в таблице
+    cursor.execute("SELECT COUNT(*) FROM recipes")
+    count = cursor.fetchone()[0]
+
+    # Если таблица пустая (count == 0), делаем вставку
+    if count == 0:
+        cursor.executemany('''
+            INSERT INTO recipes (name, category, ingredients, instructions, image, rating, votes, is_liked)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+        ''', DISHES_RECIPES)
 
     conn.commit()
     conn.close()
@@ -157,12 +163,12 @@ def index():
         scored.sort(key=lambda x: x[0], reverse=True)
         search_results = [recipe for score, recipe in scored]
 
-# Синхронизируем избранное из БД в сессию, чтобы при перезапусках всё сохранялось
+    # Синхронизируем избранное из БД в сессию, чтобы при перезапусках всё сохранялось
     db_favorites = conn.execute("SELECT id FROM recipes WHERE is_liked = 1").fetchall()
     session['favorite_ids'] = [r['id'] for r in db_favorites]
     string_favorite_ids = [str(fav_id) for fav_id in session['favorite_ids']]
 
-    # === БЛОК ИСТОРИИ ===
+    # БЛОК ИСТОРИИ
     user_guid = session.get('user_guid')
     history_dishes = []
     
@@ -175,7 +181,6 @@ def index():
             ORDER BY h.viewed_at DESC
         ''', (user_guid,)).fetchall()
 
-    # Закрываем соединение строго ПОСЛЕ всех запросов к БД
     conn.close()
 
     return render_template(
@@ -304,7 +309,7 @@ def recipe_detail(recipe_id):
         back_url = url_for('index')
     return render_template('recipe.html', dish=recipe, favorite_ids=string_favorite_ids, back_url=back_url)
 
-# ENDPOINT FOR TOGGLING LIKE STATUS (DATABASE SYNC)
+# ENDPOINT_FOR_TOGGLING_LIKE_STATUS (DATABASE SYNC)
 @app.route('/toggle_favorite/<int:recipe_id>', methods=['POST'])
 def toggle_favorite(recipe_id):
     conn = get_db_connection()

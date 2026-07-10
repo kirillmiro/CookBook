@@ -2,6 +2,8 @@
 
 {% block content %}
 <main class="main-container" id="dishes-page-container" data-favorites='{{ favorite_ids|tojson }}'>
+
+    <!-- FAVORITE DISHES -->
     <section class="dishes-section">
         <h2 class="section-title favorite">💖 Ваши Избранные блюда</h2>
         
@@ -10,6 +12,7 @@
                 {% for dish in favorite_recipes %}
                 <article class="dish-card" onclick="window.location='/recipe/{{ dish.id }}'">
                     
+                    <!-- CARD IMAGE -->
                     <div class="recipe-img-wrapper" style="height: 180px;">
                         {% if dish.category == "завтрак" %}
                             <img src="{{ url_for('static', filename='images/Dishes/breakfasts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
@@ -25,10 +28,13 @@
                     </div>
 
                     <div class="card-content">
+
+                        <!-- CARD MAIN INFO -->
                         <span class="card-category">{{ dish.category }}</span>
                         <h3 class="card-name">{{ dish.name }}</h3>
                         <p class="card-description">{{ dish.ingredients }}</p>
                         
+                        <!-- CARD FOOTER INFO -->
                         <div class="card-footer">
                             <span class="card-votes">Оценено {{ dish.votes }} раз</span>
                             <div class="card-actions">
@@ -39,6 +45,7 @@
                     </div>
                 </article>
                 {% endfor %}
+            <!-- NO FAVORITE DISHES -->
             {% else %}
                 <p class="card-description" style="grid-column: 1/-1; text-align: center; padding: 2rem 0; font-size: 1.2rem; color: var(--color-text-muted);">
                     Вы ещё не добавили ни одного блюда в избранное.

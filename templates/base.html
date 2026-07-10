@@ -11,10 +11,13 @@
 <body>
     <header>
         <nav class="navbar">
+
+            <!-- LOGO -->
             <a href="{{ url_for('index') }}" class="logo-link">
                 <img src="{{ url_for('static', filename='images/Logic.img/Logo.png') }}" class="Logo" alt="Logo_image">
             </a>
 
+            <!-- NAVIGATION LINKS -->
             <ul class="nav-links">
                 <li><a href="{{ url_for('index') }}">Главная</a></li>
                 <li><a href="{{ url_for('dishes') }}">Блюда</a></li>
@@ -22,12 +25,16 @@
                 <li><a href="#Contacts">Контакты</a></li>
             </ul>
 
+            <!-- NAVIGATION CONTROLS -->
             <div class="nav-controls">
+
+                <!-- THEME -->
                 <div class="theme-wrapper">
                     <input type="checkbox" id="theme">
                     <label for="theme"></label>
                 </div>
 
+                <!-- BURGER MENU -->
                 <div class="burger">
                     <span></span>
                     <span></span>
@@ -39,6 +46,7 @@
     
     {% block content %}{% endblock %}
 
+    <!-- FOOTER FEEDBACK -->
     <footer id="Contacts">
         <div class="footer-content">
             <p>&copy; 2026 CookBook</p>
@@ -48,6 +56,7 @@
         </div>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

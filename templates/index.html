@@ -40,12 +40,12 @@
                 <!-- CARD CONTENT -->
                 <div class="card-content">
 
-                    <!-- CARD MAIN -->
+                    <!-- CARD MAIN INFO -->
                     <span class="card-category">{{ dish.category }}</span>
                     <h3 class="card-name">{{ dish.name }}</h3>
                     <p class="card-description">{{ dish['ingredients'] }}</p>
                     
-                    <!-- CARD FOOTER -->
+                    <!-- CARD FOOTER INFO -->
                     <div class="card-footer">
                         <small class="card-votes">Оценено {{ dish.votes }} раз</small>
                         <div class="card-actions">
@@ -105,12 +105,12 @@
                 <!-- CARD CONTENT -->
                 <div class="card-content">
 
-                    <!-- CARD MAIN -->
+                    <!-- CARD MAIN INFO -->
                     <span class="card-category">{{ dish.category }}</span>
                     <h3 class="card-name">{{ dish.name }}</h3>
                     <p class="card-description">{{ dish['ingredients'] }}</p>
                     
-                    <!-- CARD FOOTER -->
+                    <!-- CARD FOOTER INFO -->
                     <div class="card-footer">
                         <small class="card-votes">Оценено {{ dish.votes }} раз</small>
                         <div class="card-actions">
@@ -155,12 +155,12 @@
                 <!-- CARD CONTENT -->
                 <div class="card-content">
 
-                    <!-- CARD MAIN -->
+                    <!-- CARD MAIN INFO -->
                     <span class="card-category">{{ dish.category }}</span>
                     <h3 class="card-name">{{ dish.name }}</h3>
                     <p class="card-description">{{ dish['ingredients'] }}</p>
                     
-                    <!-- CARD FOOTER -->
+                    <!-- CARD FOOTER INFO -->
                     <div class="card-footer">
                         <small class="card-votes">Оценено {{ dish.votes }} раз</small>
                         <div class="card-actions">
@@ -192,6 +192,7 @@
                      data-page="{{ page_number }}"
                      onclick="window.location.href='/recipe/{{ dish.id }}'">
 
+                <!-- CARD IMAGE -->
                 <div class="card-img">
                     {% if dish.category == "завтрак" %}
                         <img src="{{ url_for('static', filename='images/Dishes/breakfasts/' + dish.image) }}" class="dish-card-img" alt="{{ dish.name }}">
@@ -208,11 +209,15 @@
                     {% endif %}
                 </div>
 
+                <!-- CARD CONTENT -->
                 <div class="card-content">
+
+                    <!-- CARD MAIN INFO -->
                     <span class="card-category">{{ dish.category | upper }}</span>
                     <h3 class="card-name">{{ dish.name }}</h3>
                     <p class="card-description">{{ dish['ingredients'] }}</p>
                     
+                    <!-- CARD FOOTER INFO -->
                     <div class="card-footer">
                         <small class="card-votes">Оценено {{ dish.votes }} раз</small>
                         <div class="card-actions">
@@ -229,6 +234,7 @@
             {% endfor %}
         </div>
 
+        <!-- HISTORY BUTTONS -->
         {% if history_dishes|length > 3 %}
         <div class="history-controls-container">
             <button id="history-btn-more" class="history-ctrl-btn btn-more-orange">Смотреть дальше</button>
@@ -237,6 +243,7 @@
         </div>
         {% endif %}
 
+        <!-- HISTORY EMPTY STATE -->
         {% else %}
         <div style="padding: 1rem 0; color: var(--color-text-muted); text-align: center;">
             <span>История поиска пуста</span>
@@ -249,6 +256,7 @@
 </main>
 {% endblock %}
 
+<!-- SCRIPTS -->
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/dishes.js') }}"></script>
 <script src="{{ url_for('static', filename='js/history.js') }}"></script>

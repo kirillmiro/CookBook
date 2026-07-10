@@ -1,6 +1,3 @@
-/**
- * Глобальный скрипт для обработки карточек блюд (Лайки + Переходы на рецепт)
- */
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Считываем массив лайков с сервера при загрузке абсолютно любой страницы
     const container = document.getElementById("dishes-page-container");
@@ -15,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.FAVORITE_IDS = [];
     }
 
-    // 2. ГЛОБАЛЬНЫЙ КЛИК ПО КАРТОЧКАМ (Работает везде: Главная, Поиск, Каталог, Избранное)
+    // 2. Глобальный обработчик клика по сердечку (лайку) на карточке блюда
     document.body.addEventListener('click', (event) => {
         // Проверяем, кликнули ли мы по карточке блюда
         const card = event.target.closest('.dish-card');
@@ -31,9 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-/**
- * Универсальная функция переключения лайка (Вызывается по клику на кнопку-сердечко)
- */
+// Универсальная функция переключения лайка (Вызывается по клику на кнопку-сердечко)
 function toggleFavorite(recipeId, button) {
     const standardId = recipeId.toString();
 
@@ -59,7 +54,7 @@ function toggleFavorite(recipeId, button) {
             button.innerHTML = '♡';
             window.FAVORITE_IDS = window.FAVORITE_IDS.filter(id => id !== standardId);
             
-            // Если мы находимся на странице Избранного, плавно убираем карточку
+            // Если пользователь находимся на странице Избранного, плавно убираем карточку
             const favoriteCard = button.closest('.dish-card');
             if (window.location.pathname.includes('/favorites') && favoriteCard) {
                 favoriteCard.style.opacity = '0';

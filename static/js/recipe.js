@@ -1,6 +1,3 @@
-/**
- * Интерактивный выбор и динамическое изменение звездного рейтинга
- */
 document.addEventListener('DOMContentLoaded', () => {
     const picker = document.getElementById('recipe-stars-picker');
     const fill = document.getElementById('recipe-stars-fill');
@@ -11,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const recipeId = picker.dataset.id;
     
-    // Вытаскиваем из текста начальный рейтинг блюда (например, "4.50 ★" превращаем в число 4.50)
+    // Вытаскиваем из текста начальный рейтинг блюда
     let currentGlobalRating = parseFloat(rVal.textContent) || 0.00;
     
     // При загрузке страницы сразу выставляем звёзды в соответствии с рейтингом блюда
@@ -31,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fill.style.width = (rating * 20) + '%';
     });
     
-    // ВАЖНО: При уходе мыши возвращаем звёзды к реальному рейтингу блюда, а не к 0%
+    // При уходе мыши возвращаем звёзды к реальному рейтингу блюда, а не к 0%
     picker.addEventListener('mouseleave', () => {
         fill.style.width = (currentGlobalRating * 20) + '%';
     });
