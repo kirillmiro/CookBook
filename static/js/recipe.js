@@ -15,8 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Инициализация при загрузке страницы
     if (userRating > 0) {
         fill.style.width = (userRating * 20) + '%';
-    } else {
-        fill.style.width = (currentGlobalRating * 20) + '%';
+    } 
+    else {
+        fill.style.width = '0%';
     }
     
     // Эффект hover
@@ -38,8 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentUr = parseFloat(picker.dataset.userRating) || 0;
         if (currentUr > 0) {
             fill.style.width = (currentUr * 20) + '%';
-        } else {
-            fill.style.width = (currentGlobalRating * 20) + '%';
+        } 
+        else {
+            fill.style.width = '0%';
         }
     });
     
