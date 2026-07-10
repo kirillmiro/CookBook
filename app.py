@@ -28,7 +28,7 @@ def init_db():
     cursor.execute("DROP TABLE IF EXISTS viewed_history")
 
     # RECIPES_TABLE
-    # ТАБЛИЦА БЛЮД 
+    # ТАБЛИЦА БЛЮД
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS recipes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,8 +38,7 @@ def init_db():
             instructions TEXT NOT NULL,
             image TEXT,
             rating REAL DEFAULT 0.0,
-            votes INTEGER DEFAULT 0,
-            is_liked INTEGER DEFAULT 0
+            votes INTEGER DEFAULT 0
         )
     ''')
 
@@ -62,8 +61,8 @@ def init_db():
     # Если таблица пустая (count == 0), делаем вставку
     if count == 0:
         cursor.executemany('''
-            INSERT INTO recipes (name, category, ingredients, instructions, image, rating, votes, is_liked)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+            INSERT INTO recipes (name, category, ingredients, instructions, image, rating, votes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', DISHES_RECIPES)
 
     conn.commit()
@@ -163,10 +162,8 @@ def index():
         scored.sort(key=lambda x: x[0], reverse=True)
         search_results = [recipe for score, recipe in scored]
 
-    # Синхронизируем избранное из БД в сессию, чтобы при перезапусках всё сохранялось
-    db_favorites = conn.execute("SELECT id FROM recipes WHERE is_liked = 1").fetchall()
-    session['favorite_ids'] = [r['id'] for r in db_favorites]
-    string_favorite_ids = [str(fav_id) for fav_id in session['favorite_ids']]
+    # Избранное теперь живет только в сессии. Просто приводим ID к строкам для фронтенда
+    string_favorite_ids = [str(fav_id) for fav_id in session.get('favorite_ids', [])]
 
     # БЛОК ИСТОРИИ
     user_guid = session.get('user_guid')
@@ -196,10 +193,8 @@ def index():
 # DISHES_CATALOG_ROUTE
 @app.route('/dishes')
 def dishes():
-    conn = get_db_connection()
-    db_favorites = conn.execute("SELECT id FROM recipes WHERE is_liked = 1").fetchall()
-    session['favorite_ids'] = [r['id'] for r in db_favorites]
-    conn.close()
+    if 'favorite_ids' not in session:
+        session['favorite_ids'] = []
 
     string_favorite_ids = [str(fav_id) for fav_id in session['favorite_ids']]
     return render_template('dishes_list.html', favorite_ids=string_favorite_ids)
@@ -224,7 +219,7 @@ def dishes_category(cat):
     pages = math.ceil(total / per_page) if total > 0 else 1
 
     rows = conn.execute(f"""
-        SELECT id, name, category, ingredients, image, rating, votes, is_liked 
+        SELECT id, name, category, ingredients, image, rating, votes 
         FROM recipes 
         WHERE category = ? 
         ORDER BY {order} 
@@ -235,6 +230,8 @@ def dishes_category(cat):
 
     items = []
     for r in rows:
+        # Проверяем статус лайка динамически из сессии текущего пользователя
+        is_liked = 1 if r["id"] in session.get('favorite_ids', []) else 0
         items.append({
             "id": r["id"],
             "name": r["name"],
@@ -243,7 +240,7 @@ def dishes_category(cat):
             "image": r["image"],
             "rating": r["rating"],
             "votes": r["votes"],
-            "is_liked": r["is_liked"]
+            "is_liked": is_liked
         })
 
     return jsonify({"items": items, "page": page, "pages": pages})
@@ -251,9 +248,16 @@ def dishes_category(cat):
 # FAVORITES_PAGE_ROUTE
 @app.route('/favorites')
 def favorites():
+    if 'favorite_ids' not in session:
+        session['favorite_ids'] = []
+        
     conn = get_db_connection()
-    favorite_recipes = conn.execute("SELECT * FROM recipes WHERE is_liked = 1").fetchall()
-    session['favorite_ids'] = [r['id'] for r in favorite_recipes]
+    favorite_recipes = []
+    
+    # Если в сессии есть лайки, достаем только эти рецепты
+    if session['favorite_ids']:
+        placeholders = ','.join('?' for _ in session['favorite_ids'])
+        favorite_recipes = conn.execute(f"SELECT * FROM recipes WHERE id IN ({placeholders})", session['favorite_ids']).fetchall()
     conn.close()
 
     string_favorite_ids = [str(fav_id) for fav_id in session['favorite_ids']]
@@ -289,10 +293,6 @@ def recipe_detail(recipe_id):
 
     conn = get_db_connection()
     recipe = conn.execute("SELECT * FROM recipes WHERE id = ?", (recipe_id,)).fetchone()
-    
-    # Также синхронизируем список избранного для детальной страницы
-    db_favorites = conn.execute("SELECT id FROM recipes WHERE is_liked = 1").fetchall()
-    session['favorite_ids'] = [r['id'] for r in db_favorites]
     conn.close()
     
     if recipe is None:
@@ -313,28 +313,21 @@ def recipe_detail(recipe_id):
 @app.route('/toggle_favorite/<int:recipe_id>', methods=['POST'])
 def toggle_favorite(recipe_id):
     conn = get_db_connection()
-    recipe = conn.execute("SELECT is_liked FROM recipes WHERE id = ?", (recipe_id,)).fetchone()
+    recipe = conn.execute("SELECT id FROM recipes WHERE id = ?", (recipe_id,)).fetchone()
+    conn.close()
     
     if recipe is None:
-        conn.close()
         return jsonify({"success": False, "error": "Рецепт не найден"}), 404
         
-    new_status = 1 if recipe['is_liked'] == 0 else 0
-    conn.execute("UPDATE recipes SET is_liked = ? WHERE id = ?", (new_status, recipe_id))
-    conn.commit()
-    conn.close()
-
     if 'favorite_ids' not in session:
         session['favorite_ids'] = []
         
-    if new_status == 1:
-        if recipe_id not in session['favorite_ids']:
-            session['favorite_ids'].append(recipe_id)
-        status_text = 'added'
-    else:
-        if recipe_id in session['favorite_ids']:
-            session['favorite_ids'].remove(recipe_id)
+    if recipe_id in session['favorite_ids']:
+        session['favorite_ids'].remove(recipe_id)
         status_text = 'removed'
+    else:
+        session['favorite_ids'].append(recipe_id)
+        status_text = 'added'
         
     session.modified = True
     return jsonify({"success": True, "status": status_text})
@@ -369,28 +362,24 @@ def rate_recipe(recipe_id):
     if recipe_id_str in session['rated_recipes']:
         # Сценарий: ИЗМЕНЕНИЕ ОЦЕНКИ
         old_user_rating = float(session['rated_recipes'][recipe_id_str])
-        
-        # Пересчитываем сумму баллов без увеличения счётчика голосов
         if current_votes > 0:
             total_score = (current_rating * current_votes) - old_user_rating + new_user_rating
-            updated_rating = round(total_score / current_votes, 2)
+            updated_rating = total_score / current_votes
         else:
             updated_rating = new_user_rating
             current_votes = 1
-            
         updated_votes = current_votes
     else:
         # Сценарий: НОВЫЙ ГОЛОС
         updated_votes = current_votes + 1
         total_score = (current_rating * current_votes) + new_user_rating
-        updated_rating = round(total_score / updated_votes, 2)
+        updated_rating = total_score / updated_votes
 
-    # Сохраняем новые данные в БД
-    cursor.execute(
-        "UPDATE recipes SET rating = ?, votes = ? WHERE id = ?", 
-        (updated_rating, updated_votes, recipe_id)
-    )
-    db.commit()
+    # Жесткое ограничение верхнего порога и округление для всех исходов
+    if updated_rating > 5.0:
+        updated_rating = 5.0
+        
+    updated_rating = round(max(0.0, updated_rating), 2)
 
     # Обновляем значение в сессии пользователя
     session['rated_recipes'][recipe_id_str] = new_user_rating
