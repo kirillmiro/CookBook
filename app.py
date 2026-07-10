@@ -2,6 +2,8 @@ import sqlite3
 import datetime
 import math
 from rapidfuzz import fuzz
+import random
+from zoneinfo import ZoneInfo
 from flask import Flask, render_template, request, jsonify, session, url_for
 
 # Импортируем наш обновленный список рецептов из файла данных
@@ -9,8 +11,8 @@ from recipes_data import DISHES_RECIPES
 
 # APP CONFIGURATION
 app = Flask(__name__, static_url_path='/static')
-# Добавляем секретный ключ для работы сессий Flask (нужно для Избранного)
-app.secret_key = 'super_secret_key_foodfinder_2026'
+# Добавляем секретный ключ для работы сессий Flask
+app.secret_key = 'super_secret_key_CookBook_2026'
 
 # DATABASE CONNECTION
 def get_db_connection():
@@ -24,8 +26,9 @@ def init_db():
     cursor = conn.cursor()
 
     # DROPPING TABLES FOR QUICK RESTART IF NEEDED (UNCOMMENT IF NECESSARY)
-    cursor.execute("DROP TABLE IF EXISTS recipes")
-    cursor.execute("DROP TABLE IF EXISTS viewed_history")
+    # cursor.execute("DROP TABLE IF EXISTS recipes")
+    # cursor.execute("DROP TABLE IF EXISTS viewed_history")
+    # cursor.execute("DROP TABLE IF EXISTS featured_dishes")
 
     # RECIPES_TABLE
     # ТАБЛИЦА БЛЮД
@@ -53,6 +56,17 @@ def init_db():
         )
     ''')
 
+    # ТАБЛИЦА БЛЮД ДНЯ И ПОПУЛЯРНОГО НА НЕДЕЛЕ
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS featured_dishes (
+            type TEXT NOT NULL,
+            recipe_id INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            updated_at TEXT NOT NULL,
+            PRIMARY KEY (type, position)
+        )
+    """)
+
     # DB_FILLING
     # Проверяем количество записей в таблице
     cursor.execute("SELECT COUNT(*) FROM recipes")
@@ -76,30 +90,143 @@ def calculate_popularity_score(recipe):
         return -1.0
     return rating * math.log1p(votes)
 
-# Ротация для Блюд Дня и Популярного на Неделе
+
 def get_featured_dishes(all_recipes):
-    if len(all_recipes) < 3:
-        return list(all_recipes), list(all_recipes)
-        
-    today = datetime.date.today()
-    day_of_year = today.timetuple().tm_yday
-    week_of_year = today.isocalendar()[1]
-    
-    sorted_by_popularity = sorted(all_recipes, key=calculate_popularity_score, reverse=True)
-    top_pool = sorted_by_popularity[:10]
-    if len(top_pool) < 3:
-        top_pool = list(all_recipes)
-        
-    day_dishes = []
-    for i in range(3):
-        idx = (day_of_year + i) % len(top_pool)
-        day_dishes.append(top_pool[idx])
-        
-    popular_dishes = []
-    for i in range(3):
-        idx = (week_of_year + i + 3) % len(top_pool)
-        popular_dishes.append(top_pool[idx])
-        
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    now = datetime.datetime.now(ZoneInfo("Europe/Tallinn"))
+
+    today = now.date()
+    today_str = today.isoformat()
+
+    days_since_sunday = (now.weekday() + 1) % 7
+    sunday = today - datetime.timedelta(days=days_since_sunday)
+    sunday_str = sunday.isoformat()
+
+    def load_featured(feature_type):
+        cursor.execute("""
+            SELECT recipe_id
+            FROM featured_dishes
+            WHERE type = ?
+            ORDER BY position
+        """, (feature_type,))
+        ids = [row["recipe_id"] for row in cursor.fetchall()]
+
+        if not ids:
+            return []
+
+        dishes = []
+        for recipe_id in ids:
+            recipe = next((r for r in all_recipes if r["id"] == recipe_id), None)
+            if recipe:
+                dishes.append(recipe)
+
+        return dishes
+
+    def save_featured(feature_type, dishes, updated_at):
+        cursor.execute(
+            "DELETE FROM featured_dishes WHERE type = ?",
+            (feature_type,)
+        )
+
+        for pos, dish in enumerate(dishes):
+            cursor.execute("""
+                INSERT INTO featured_dishes
+                (type, recipe_id, position, updated_at)
+                VALUES (?, ?, ?, ?)
+            """, (
+                feature_type,
+                dish["id"],
+                pos,
+                updated_at
+            ))
+
+        db.commit()
+
+    cursor.execute("""
+        SELECT updated_at
+        FROM featured_dishes
+        WHERE type='day'
+        LIMIT 1
+    """)
+    row = cursor.fetchone()
+    need_new_day = False
+
+    if row is None:
+        need_new_day = True
+
+    else:
+        last = datetime.date.fromisoformat(row["updated_at"])
+        if (today > last and now.hour >= 12):
+            need_new_day = True
+
+    if need_new_day:
+
+        ranked = sorted(
+            all_recipes,
+            key=calculate_popularity_score,
+            reverse=True
+        )
+
+        pool = ranked[:30]
+
+        top10 = pool[:10]
+        top20 = pool[10:20]
+        top30 = pool[20:30]
+
+        random.shuffle(top10)
+        random.shuffle(top20)
+        random.shuffle(top30)
+
+        selected = []
+        selected.extend(top10[:2])
+
+        if top20:
+            selected.append(top20[0])
+
+        while len(selected) < 3:
+            for d in pool:
+                if d not in selected:
+                    selected.append(d)
+                if len(selected) == 3:
+                    break
+
+        save_featured("day", selected, today_str)
+
+    day_dishes = load_featured("day")
+    cursor.execute("""
+        SELECT updated_at
+        FROM featured_dishes
+        WHERE type='week'
+        LIMIT 1
+    """)
+    row = cursor.fetchone()
+    need_new_week = False
+
+    if row is None:
+        need_new_week = True
+
+    else:
+        last = datetime.date.fromisoformat(row["updated_at"])
+
+        if (sunday > last and now.weekday() == 6 and now.hour >= 12):
+            need_new_week = True
+
+    if need_new_week:
+        ranked = sorted(
+            all_recipes,
+            key=calculate_popularity_score,
+            reverse=True
+        )
+        pool = ranked[:30]
+        random.shuffle(pool)
+        selected = pool[:3]
+        save_featured("week", selected, sunday_str)
+
+    popular_dishes = load_featured("week")
+    db.close()
+
     return day_dishes, popular_dishes
 
 # MAIN_ROUTE
@@ -385,9 +512,18 @@ def rate_recipe(recipe_id):
     session['rated_recipes'][recipe_id_str] = new_user_rating
     session.modified = True
 
+    cursor.execute("""
+        UPDATE recipes
+        SET rating = ?, votes = ?
+        WHERE id = ?
+    """, (updated_rating, updated_votes, recipe_id))
+
+    db.commit()
+    db.close()
+
     return jsonify({
-        'success': True, 
-        'new_rating': updated_rating, 
+        'success': True,
+        'new_rating': updated_rating,
         'new_votes': updated_votes
     })
 

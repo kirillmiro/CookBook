@@ -276,6 +276,8 @@ header {
     flex-wrap: wrap;
     gap: 30px;
     justify-content: center;
+    max-width: 1140px; 
+    margin: 0 auto;
 }
 
 /* Принудительно задаем размер карточкам внутри истории, как в оригинальной сетке */

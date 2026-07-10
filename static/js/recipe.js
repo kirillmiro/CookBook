@@ -7,18 +7,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!picker || !fill) return;
     
     const recipeId = picker.dataset.id;
-    // Объявляем переменную на уровне всего обработчика событий страницы
-    let currentGlobalRating = parseFloat(rVal.textContent) || 0.00;
+    
+    // Очищаем строку от знака ★ и пробелов, чтобы получить чистое float число
+    let currentGlobalRating = parseFloat(rVal.textContent.replace('★', '').trim()) || 0.00;
+    const userRating = parseFloat(picker.dataset.userRating) || 0;
 
-    // Инициализация при загрузке страницы: красим под оценку юзера или под средний рейтинг
-    const userRating = parseFloat(picker.dataset.userRating);
-    if (!isNaN(userRating) && userRating > 0) {
+    // Инициализация при загрузке страницы
+    if (userRating > 0) {
         fill.style.width = (userRating * 20) + '%';
     } else {
         fill.style.width = (currentGlobalRating * 20) + '%';
     }
     
-    // Эффект hover (движение мыши) - строго следует по 0.5 звёзд
+    // Эффект hover
     picker.addEventListener('mousemove', (e) => {
         const rect = picker.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -32,17 +33,17 @@ document.addEventListener('DOMContentLoaded', () => {
         fill.style.width = (rating * 20) + '%';
     });
     
-    // Сброс hover при уходе мыши
+    // Сброс hover
     picker.addEventListener('mouseleave', () => {
-        const currentUr = parseFloat(picker.dataset.userRating);
-        if (!isNaN(currentUr) && currentUr > 0) {
+        const currentUr = parseFloat(picker.dataset.userRating) || 0;
+        if (currentUr > 0) {
             fill.style.width = (currentUr * 20) + '%';
         } else {
             fill.style.width = (currentGlobalRating * 20) + '%';
         }
     });
     
-    // Клик на звезду
+    // Клик мышкой
     picker.addEventListener('click', (e) => {
         const rect = picker.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -61,16 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // ВАЖНО: Актуализируем глобальный средний рейтинг, полученный от сервера
+                // Перезаписываем глобальную переменную новым средним значением от сервера
                 currentGlobalRating = data.new_rating;
                 
+                // Обновляем текст на UI (теперь при обновлении страницы он будет браться из сессии/бд верно)
                 rVal.textContent = data.new_rating.toFixed(2) + ' ★';
                 vVal.textContent = 'Оценено ' + data.new_votes + ' раз';
                 
-                // Запоминаем личную оценку в дата-атрибут
+                // Фиксируем выбор пользователя в DOM
                 picker.dataset.userRating = finalRating;
-                
-                // Визуально фиксируем закраску звёзд под выбор пользователя
                 fill.style.width = (finalRating * 20) + '%';
             } else {
                 console.error('Ошибка при сохранении оценки:', data.error);
@@ -78,5 +78,4 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => console.error('Ошибка отправки запроса:', err));
     });
-
 });
