@@ -8,11 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const recipeId = picker.dataset.id;
     
-    // Вытаскиваем из текста начальный рейтинг блюда
-    let currentGlobalRating = parseFloat(rVal.textContent) || 0.00;
-    
-    // При загрузке страницы сразу выставляем звёзды в соответствии с рейтингом блюда
-    fill.style.width = (currentGlobalRating * 20) + '%';
+    // Проверяем, есть ли личная оценка пользователя из сессии
+    const userRating = parseFloat(picker.dataset.userRating);
+
+    if (!isNaN(userRating) && userRating > 0) {
+        // Если пользователь уже голосовал, красим звёзды под ЕГО оценку
+        fill.style.width = (userRating * 20) + '%';
+    } else {
+        // Если ещё не голосовал, показываем общий средний рейтинг блюда
+        let currentGlobalRating = parseFloat(rVal.textContent) || 0.00;
+        fill.style.width = (currentGlobalRating * 20) + '%';
+    }
     
     // Подсветка звезд при движении мыши
     picker.addEventListener('mousemove', (e) => {
@@ -30,7 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // При уходе мыши возвращаем звёзды к реальному рейтингу блюда, а не к 0%
     picker.addEventListener('mouseleave', () => {
-        fill.style.width = (currentGlobalRating * 20) + '%';
+        const userRating = parseFloat(picker.dataset.userRating);
+        if (!isNaN(userRating) && userRating > 0) {
+            fill.style.width = (userRating * 20) + '%';
+        } else {
+            let currentGlobalRating = parseFloat(rVal.textContent) || 0.00;
+            fill.style.width = (currentGlobalRating * 20) + '%';
+        }
     });
     
     // Клик для фиксации или изменения оценки
@@ -65,6 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 console.error('Ошибка при сохранении оценки:', data.error);
             }
+
+            // Фиксируем закраску звёзд на новом пересчитанном рейтинге блюда
+            fill.style.width = (currentGlobalRating * 20) + '%'; // или ставь тут finalRating, если хочешь зафиксировать именно палец пользователя
+            
+            // ДОБАВЬ ЭТУ СТРОЧКУ (чтобы JS запомнил новую оценку до перезагрузки):
+            picker.dataset.userRating = finalRating;
         })
         .catch(err => console.error('Ошибка отправки запроса:', err));
     });

@@ -24,8 +24,8 @@ def init_db():
     cursor = conn.cursor()
 
     # DROPPING TABLES FOR QUICK RESTART IF NEEDED (UNCOMMENT IF NECESSARY)
-    # cursor.execute("DROP TABLE IF EXISTS recipes")
-    # cursor.execute("DROP TABLE IF EXISTS viewed_history")
+    cursor.execute("DROP TABLE IF EXISTS recipes")
+    cursor.execute("DROP TABLE IF EXISTS viewed_history")
 
     # RECIPES_TABLE
     # ТАБЛИЦА БЛЮД 

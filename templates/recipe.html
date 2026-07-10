@@ -46,7 +46,7 @@
             <div class="recipe-section-block">
                 <h2 class="recipe-section-title">⭐ Оцените рецепт:</h2>
                 <div class="recipe-stars-wrapper">
-                    <div class="recipe-stars-container" id="recipe-stars-picker" data-id="{{ dish.id }}">
+                    <div class="recipe-stars-container" id="recipe-stars-picker" data-id="{{ dish.id }}" data-user-rating="{{ session.get('rated_recipes', {}).get(dish.id|string, '') }}">
                         <div class="recipe-stars-gray">★★★★★</div>
                         <div class="recipe-stars-active" id="recipe-stars-fill">★★★★★</div>
                     </div>
